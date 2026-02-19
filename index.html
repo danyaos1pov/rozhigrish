@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Neon Radio Pro</title>
+    <style>
+        :root {
+            --neon: #00ff9d;
+            --bg: #0a0a0c;
+            --surface: #16161a;
+            --text-main: #e4e4e7;
+            --text-dim: #71717a;
+        }
+
+        /* Запрет выделения текста по всему приложению */
+        * { 
+            box-sizing: border-box; 
+            -webkit-tap-highlight-color: transparent;
+            user-select: none; 
+            -webkit-user-select: none;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text-main);
+            font-family: 'Inter', -apple-system, system-ui, sans-serif;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .app-shell {
+            width: 100%;
+            max-width: 450px;
+            background: var(--bg);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        /* Шапка */
+        header {
+            padding: 30px 20px 10px;
+            text-align: left;
+        }
+
+        header h1 {
+            font-size: 24px;
+            margin: 0;
+            letter-spacing: -1px;
+            color: white;
+        }
+
+        header span {
+            color: var(--neon);
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        /* Кастомный селект */
+        .search-area {
+            padding: 15px 20px;
+        }
+
+        select {
+            width: 100%;
+            background: var(--surface);
+            color: white;
+            border: 1px solid #27272a;
+            padding: 14px;
+            border-radius: 12px;
+            font-size: 16px;
+            outline: none;
+            cursor: pointer;
+        }
+
+        /* Список станций */
+        .list-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 10px 20px;
+            mask-image: linear-gradient(to bottom, transparent, black 5%, black 95%, transparent);
+        }
+
+        .station-card {
+            background: var(--surface);
+            margin-bottom: 10px;
+            padding: 16px;
+            border-radius: 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.2s ease;
+            border: 1px solid transparent;
+        }
+
+        .station-card:active {
+            transform: scale(0.97);
+            background: #1f1f23;
+        }
+
+        .station-card.active {
+            border-color: var(--neon);
+            box-shadow: 0 0 15px rgba(0, 255, 157, 0.1);
+        }
+
+        .station-info {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .name { font-weight: 500; font-size: 15px; }
+        .tags { font-size: 11px; color: var(--text-dim); text-transform: lowercase; }
+
+        /* Панель управления (плеер) */
+        .player-bar {
+            background: #111114;
+            border-top: 1px solid #27272a;
+            padding: 25px 25px 40px;
+            border-radius: 30px 30px 0 0;
+        }
+
+        .now-playing-label {
+            font-size: 10px;
+            color: var(--neon);
+            text-transform: uppercase;
+            margin-bottom: 8px;
+            display: block;
+            text-align: center;
+        }
+
+        #current-title {
+            display: block;
+            text-align: center;
+            font-weight: 600;
+            margin-bottom: 20px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .controls-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+        }
+
+        .play-trigger {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            border: none;
+            background: var(--neon);
+            color: black;
+            font-size: 24px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 0 25px rgba(0, 255, 157, 0.3);
+        }
+
+        .vol-slider {
+            flex: 1;
+            height: 4px;
+            accent-color: var(--neon);
+            background: #27272a;
+            border-radius: 2px;
+        }
+
+        /* Скроллбар */
+        .list-container::-webkit-scrollbar { width: 0; }
+    </style>
+</head>
+<body>
+
+<div class="app-shell">
+    <header>
+        <span>Digital Tuner</span>
+        <h1>Global Radio</h1>
+    </header>
+
+    <div class="search-area">
+        <select id="countryPicker">
+            <option value="RU">🇷🇺 Russia</option>
+            <option value="US">🇺🇸 USA</option>
+            <option value="DE">🇩🇪 Germany</option>
+            <option value="FR">🇫🇷 France</option>
+            <option value="JP">🇯🇵 Japan</option>
+            <option value="BR">🇧🇷 Brazil</option>
+        </select>
+    </div>
+
+    <div class="list-container" id="stationsView">
+        </div>
+
+    <div class="player-bar">
+        <span class="now-playing-label" id="statusLabel">Ready to play</span>
+        <span id="current-title">Select a station</span>
+
+        <div class="controls-row">
+            <button class="play-trigger" id="masterPlay">▶</button>
+            <input type="range" class="vol-slider" id="volControl" min="0" max="1" step="0.05" value="0.5">
+        </div>
+    </div>
+</div>
+
+<audio id="coreAudio"></audio>
+
+<script>
+    const audio = document.getElementById('coreAudio');
+    const masterPlay = document.getElementById('masterPlay');
+    const stationsView = document.getElementById('stationsView');
+    const countryPicker = document.getElementById('countryPicker');
+    const currentTitle = document.getElementById('current-title');
+    const statusLabel = document.getElementById('statusLabel');
+    const volControl = document.getElementById('volControl');
+
+    let isPlaying = false;
+
+    async function loadData(cc) {
+        stationsView.innerHTML = '<div style="opacity:0.3; text-align:center; margin-top:50px;">Scanning frequencies...</div>';
+        try {
+            const r = await fetch(`https://de1.api.radio-browser.info/json/stations/bycountrycodeexact/${cc}?limit=30&order=votes&reverse=true&https=true`);
+            const data = await r.json();
+            render(data);
+        } catch (e) {
+            stationsView.innerHTML = 'Error loading stations.';
+        }
+    }
+
+    function render(list) {
+        stationsView.innerHTML = '';
+        list.forEach(s => {
+            const card = document.createElement('div');
+            card.className = 'station-card';
+            card.innerHTML = `
+                <div class="station-info">
+                    <div class="name">${s.name}</div>
+                    <div class="tags">${s.tags.slice(0, 30) || 'no tags'}</div>
+                </div>
+                <div style="color:var(--neon)">→</div>
+            `;
+            card.onclick = () => play(s.url_resolved, s.name, card);
+            stationsView.appendChild(card);
+        });
+    }
+
+    function play(url, name, el) {
+        document.querySelectorAll('.station-card').forEach(c => c.classList.remove('active'));
+        el.classList.add('active');
+
+        statusLabel.innerText = 'Connecting...';
+        currentTitle.innerText = name;
+
+        audio.src = url;
+        audio.play().then(() => {
+            isPlaying = true;
+            masterPlay.innerText = '⏸';
+            statusLabel.innerText = 'Live Streaming';
+        }).catch(() => {
+            statusLabel.innerText = 'Stream Offline';
+            isPlaying = false;
+        });
+    }
+
+    masterPlay.onclick = () => {
+        if (!audio.src) return;
+        if (isPlaying) {
+            audio.pause();
+            masterPlay.innerText = '▶';
+            statusLabel.innerText = 'Paused';
+        } else {
+            audio.play();
+            masterPlay.innerText = '⏸';
+            statusLabel.innerText = 'Live Streaming';
+        }
+        isPlaying = !isPlaying;
+    };
+
+    volControl.oninput = (e) => audio.volume = e.target.value;
+    countryPicker.onchange = (e) => loadData(e.target.value);
+
+    // Инициализация
+    loadData('RU');
+</script>
+
+</body>
+</html>
