@@ -8,7 +8,17 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&display=swap');
-        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+        
+        * { 
+            box-sizing: border-box; 
+            margin: 0; 
+            padding: 0; 
+            -webkit-tap-highlight-color: transparent; 
+            /* Блокировка выделения текста для имитации приложения */
+            -webkit-touch-callout: none; 
+            -webkit-user-select: none;   
+            user-select: none;
+        }
 
         body {
             background: radial-gradient(circle at 0% 0%, #1e1e2f 0%, #0a0a0c 50%, #1a0b2e 100%);
@@ -20,6 +30,7 @@
             justify-content: space-between;
             padding: 30px 20px;
             overflow: hidden;
+            touch-action: manipulation; /* Запрет лишних жестов браузера */
         }
 
         body::before {
@@ -55,7 +66,15 @@
         }
 
         .card-label { font-size: 11px; font-weight: 700; color: rgba(255,255,255,0.4); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
-        .card-id { font-size: 26px; font-weight: 900; color: #fff; letter-spacing: 1px; }
+        .card-id { 
+            font-size: 26px; 
+            font-weight: 900; 
+            color: #fff; 
+            letter-spacing: 1px; 
+            /* Разрешаем копировать только ID, если нужно */
+            -webkit-user-select: text;
+            user-select: text;
+        }
 
         .footer { z-index: 10; margin-bottom: 10px; }
 
@@ -112,7 +131,10 @@
         const tg = window.Telegram.WebApp;
         tg.expand();
 
-        // Данные обновлены на raffle[cite: 1]
+        // Блокировка контекстного меню (правой кнопки мыши)
+        document.addEventListener('contextmenu', e => e.preventDefault());
+
+        // Конфигурация Supabase
         const SUPABASE_URL = 'https://yvnnngfzzjdbeiscwluy.supabase.co';
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl2bm5uZ2Z6empkYmVpc2N3bHV5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ0NzY2ODYsImV4cCI6MjA5MDA1MjY4Nn0.SesGG2QhbJKfAklZDiL8oolWQ6qaTtBwRL_tvigpd9A';
         
@@ -135,7 +157,7 @@
             btn.disabled = false;
 
             try {
-                // Проверка в таблице raffle[cite: 1]
+                // Проверка участия в таблице raffle
                 const { data } = await sb
                     .from('raffle')
                     .select('telegram_id')
@@ -146,7 +168,7 @@
                     setAlreadyParticipant();
                 }
             } catch (e) {
-                console.warn("Ошибка проверки участия:", e);
+                console.warn("Ошибка проверки статуса:", e);
             }
         }
 
@@ -163,7 +185,7 @@
             btn.disabled = true;
             btn.textContent = "ОБРАБОТКА...";
             
-            // Сохранение в таблицу raffle[cite: 1]
+            // Запись данных в таблицу raffle
             const { error } = await sb.from('raffle').upsert({ 
                 telegram_id: user.id.toString(), 
                 first_name: user.first_name || '', 
@@ -175,7 +197,7 @@
                 btn.disabled = false;
                 btn.textContent = "УЧАСТВОВАТЬ";
             } else {
-                tg.showAlert("Поздравляем! Вы успешно зарегистрированы.");
+                tg.showAlert("Вы успешно приняли участие в розыгрыше!");
                 setAlreadyParticipant();
             }
         };
