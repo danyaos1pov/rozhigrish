@@ -2,162 +2,359 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>ON1X</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ON1X VPN — Свободный интернет</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&display=swap');
-        
-        * { 
-            box-sizing: border-box; 
-            margin: 0; 
-            padding: 0; 
-            -webkit-tap-highlight-color: transparent; 
-            /* Блокировка выделения текста для имитации приложения */
-            -webkit-touch-callout: none; 
+        :root {
+            /* Темная тема — Необрутализм (Графит + Токсичный лайм) */
+            --bg-main: #0b0f17;
+            --card-bg: #1e293b;
+            --card-border: #000000;
+            --shadow-color: #000000;
+            --text-title: #ffffff;
+            --text-body: #f8fafc;
+            --text-sub: #94a3b8;
+            
+            --btn-primary-bg: #ccff00;
+            /* Яркий акцент */
+            --btn-primary-text: #000000;
+            --btn-secondary-bg: #0f172a;
+            --btn-secondary-border: #000000;
+            
+            --slider-bg: #1e293b;
+            --slider-thumb: #ccff00;
+            
+            --success-color: #22c55e;
+        }
+
+        [data-theme="light"] {
+            /* Светлая тема — Газетный брутализм */
+            --bg-main: #f1f5f9;
+            --card-bg: #ffffff;
+            --card-border: #000000;
+            --shadow-color: #000000;
+            --text-title: #000000;
+            --text-body: #0f172a;
+            --text-sub: #64748b;
+            
+            --btn-primary-bg: #000000;
+            --btn-primary-text: #ffffff;
+            --btn-secondary-bg: #f8fafc;
+            --btn-secondary-border: #000000;
+            --slider-bg: #ffffff;
+            --slider-thumb: #000000;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+            -webkit-touch-callout: none;
             -webkit-user-select: none;   
             user-select: none;
         }
 
         body {
-            background: radial-gradient(circle at 0% 0%, #1e1e2f 0%, #0a0a0c 50%, #1a0b2e 100%);
-            color: #fff;
-            font-family: 'Montserrat', sans-serif;
-            height: 100vh;
+            background-color: var(--bg-main);
+            color: var(--text-body);
             display: flex;
             flex-direction: column;
-            justify-content: space-between;
-            padding: 30px 20px;
-            overflow: hidden;
-            touch-action: manipulation;
+            align-items: center;
+            min-height: 100vh;
+            padding: 40px 24px;
+            transition: background 0.3s ease;
         }
 
-        body::before {
-            content: "";
-            position: absolute;
-            width: 300px; height: 300px;
-            background: linear-gradient(135deg, #6366f1, #a855f7);
-            filter: blur(80px);
-            border-radius: 50%;
-            top: 10%; right: -50px;
-            opacity: 0.4;
-            z-index: 0;
+        /* Переключатель темы (в стиле Необрутализм) */
+        .theme-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            margin-bottom: 40px;
         }
 
-        .header { display: flex; justify-content: space-between; align-items: center; z-index: 10; }
-        .logo { font-weight: 900; font-size: 22px; letter-spacing: 1px; color: #fff; }
-        .status-dot { width: 8px; height: 8px; background: #22c55e; border-radius: 50%; box-shadow: 0 0 10px #22c55e; margin-right: 8px; }
-        .status-wrap { display: flex; align-items: center; font-size: 12px; font-weight: 700; color: #aaa; }
-
-        .content { z-index: 10; margin-top: 40px; }
-        .title { font-size: 38px; font-weight: 900; line-height: 1.1; margin-bottom: 10px; }
-        .title span { background: linear-gradient(90deg, #6366f1, #c084fc); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .desc { font-size: 15px; color: rgba(255,255,255,0.6); line-height: 1.5; margin-bottom: 35px; }
-
-        .glass-card {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.12);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border-radius: 24px;
-            padding: 25px;
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        .theme-switch {
+            position: relative;
+            width: 64px;
+            height: 34px;
+            background: var(--slider-bg);
+            border: 2px solid var(--card-border);
+            border-radius: 0px;
+            /* Жесткие углы */
+            box-shadow: 3px 3px 0px var(--shadow-color);
+            cursor: pointer;
+            padding: 3px;
         }
 
-        .card-label { font-size: 11px; font-weight: 700; color: rgba(255,255,255,0.4); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
-        .card-id { 
-            font-size: 26px; 
-            font-weight: 900; 
-            color: #fff; 
-            letter-spacing: 1px; 
-            /* Разрешаем копировать только ID, если нужно */
+        .theme-checkbox {
+            display: none;
+        }
+
+        .theme-handle {
+            width: 24px;
+            height: 24px;
+            background-color: var(--slider-thumb);
+            border: 2px solid var(--card-border);
+            transition: transform 0.2s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+        }
+
+        .theme-checkbox:checked + .theme-switch .theme-handle {
+            transform: translateX(30px);
+        }
+
+        /* Контейнер */
+        .container {
+            width: 100%;
+            max-width: 360px;
+            display: flex;
+            flex-direction: column;
+            gap: 28px;
+        }
+
+        /* Шапка */
+        .brand-header {
+            text-align: center;
+        }
+
+        .brand-title {
+            font-size: 42px;
+            font-weight: 900;
+            letter-spacing: -1px;
+            color: var(--text-title);
+            text-transform: uppercase;
+            -webkit-text-stroke: 1px var(--card-border);
+        }
+
+        .brand-slogan {
+            display: inline-block;
+            font-size: 12px;
+            background: var(--btn-primary-bg);
+            color: var(--btn-primary-text);
+            border: 2px solid var(--card-border);
+            padding: 2px 8px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 6px;
+            box-shadow: 2px 2px 0px var(--shadow-color);
+        }
+
+        /* Жесткие брутальные блоки */
+        .section-box {
+            background: var(--card-bg);
+            border: 3px solid var(--card-border);
+            border-radius: 0px; /* Фирменный отказ от сильных округлений */
+            padding: 20px 16px 16px 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            /* Фирменная жесткая тень */
+            box-shadow: 8px 8px 0px var(--shadow-color);
+            position: relative;
+        }
+
+        .section-title {
+            font-size: 12px;
+            font-weight: 900;
+            color: var(--text-title);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: -4px;
+        }
+
+        .desc-text {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--text-body);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            transition: color 0.3s ease;
+        }
+
+        .desc-text.success {
+            color: var(--success-color) !important;
+        }
+
+        .card-id {
+            font-size: 24px;
+            font-weight: 900;
+            color: var(--text-title);
+            letter-spacing: 1px;
             -webkit-user-select: text;
             user-select: text;
         }
 
-        .footer { z-index: 10; margin-bottom: 10px; }
-
-        .btn {
-            width: 100%;
-            background: linear-gradient(90deg, #6366f1, #a855f7);
-            color: #fff;
-            border: none;
-            padding: 22px;
-            border-radius: 18px;
-            font-size: 18px;
-            font-weight: 900;
+        .date-badge {
+            font-size: 11px;
+            font-weight: 800;
+            color: var(--card-border);
+            background: #fff;
+            border: 2px solid var(--card-border);
+            padding: 4px 8px;
+            align-self: flex-start;
+            box-shadow: 2px 2px 0px var(--shadow-color);
             text-transform: uppercase;
-            letter-spacing: 1px;
+        }
+
+        /* Кнопки */
+        .btn {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            padding: 16px 20px;
+            font-size: 16px;
+            font-weight: 800;
+            text-decoration: none;
+            border: 2px solid var(--card-border);
+            position: relative;
+            box-shadow: 4px 4px 0px var(--shadow-color);
+            transition: transform 0.1s ease, box-shadow 0.1s ease;
             cursor: pointer;
-            box-shadow: 0 10px 25px rgba(99, 102, 241, 0.4);
-            transition: 0.3s;
         }
 
+        .btn-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .btn svg {
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 2.5;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        /* Эффект нажатия (кнопка физически вдавливается) */
+        .btn:not(:disabled):active {
+            transform: translate(2px, 2px);
+            box-shadow: 2px 2px 0px var(--shadow-color);
+        }
+
+        /* Главная кнопка */
+        .btn-primary {
+            background: var(--btn-primary-bg);
+            color: var(--btn-primary-text);
+        }
+
+        /* Изменение состояния кнопки при отключении (Загрузка/Успех) */
         .btn:disabled {
-            background: rgba(255, 255, 255, 0.05) !important;
-            color: rgba(255, 255, 255, 0.2) !important;
+            background: var(--btn-secondary-bg) !important;
+            color: var(--text-sub) !important;
             box-shadow: none !important;
-            cursor: not-allowed !important;
+            transform: translate(4px, 4px);
+            cursor: not-allowed;
         }
 
-        .btn-success {
-            background: rgba(34, 197, 94, 0.1) !important;
-            color: #22c55e !important;
-            border: 1px solid #22c55e !important;
+        /* Если уже участвует */
+        .btn.btn-success {
+            border: 2px solid var(--success-color) !important;
+            color: var(--success-color) !important;
+            background: var(--btn-secondary-bg) !important;
+            box-shadow: none !important;
+            transform: translate(4px, 4px);
+        }
+
+        .arrow-icon {
+            opacity: 0.9;
         }
     </style>
 </head>
 <body>
-    <div class="header">
-        <div class="logo">ON1X</div>
-        <div class="status-wrap"><div class="status-dot"></div> <span id="status-txt">ОНЛАЙН</span></div>
+
+    <div class="theme-container">
+        <input type="checkbox" id="themeInput" class="theme-checkbox">
+        <label for="themeInput" class="theme-switch">
+            <div class="theme-handle"></div>
+        </label>
     </div>
 
-    <div class="content">
-        <h1 class="title">ON1X VPN<br><span>РОЗЫГРЫШ</span></h1>
-        <p class="desc">Подтверди свое участие в розыгрыше по кнопке ниже</p>
-        <div class="glass-card">
-            <div class="card-label">Твой цифровой ID</div>
+    <div class="container">
+        
+        <header class="brand-header">
+            <h1 class="brand-title">ON1X VPN</h1>
+            <p class="brand-slogan">Розыгрыш подписок</p>
+        </header>
+
+        <main class="section-box">
+            <div class="desc-text" id="desc-txt">Для участия нажмите кнопку ниже</div>
+            
+            <div class="section-title">Твой цифровой ID</div>
             <div class="card-id" id="user-id">Думаю..</div>
-        </div>
-    </div>
+            
+            <div class="date-badge">Завершение: 25.06.2026</div>
+        </main>
 
-    <div class="footer">
-        <button class="btn" id="main-btn" disabled>ЗАГРУЗКА...</button>
+        <section class="section-box" style="box-shadow: none; border: none; background: transparent; padding: 0;">
+            <button class="btn btn-primary" id="main-btn" disabled>
+                <div class="btn-left">
+                    <svg width="20" height="20" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+                    <span id="btn-text">ЗАГРУЗКА...</span>
+                </div>
+                <svg width="16" height="16" viewBox="0 0 24 24" class="arrow-icon"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+            </button>
+        </section>
+
     </div>
 
     <script>
+        // Логика переключения тем из твоего оригинального шаблона
+        const themeInput = document.getElementById('themeInput');
+        const savedTheme = localStorage.getItem('theme') || 'dark';
+        if (savedTheme === 'light') {
+            document.documentElement.setAttribute('data-theme', 'light');
+            themeInput.checked = true;
+        } else {
+            document.documentElement.setAttribute('data-theme', 'dark');
+            themeInput.checked = false;
+        }
+
+        themeInput.addEventListener('change', () => {
+            if (themeInput.checked) {
+                document.documentElement.setAttribute('data-theme', 'light');
+                localStorage.setItem('theme', 'light');
+            } else {
+                document.documentElement.setAttribute('data-theme', 'dark');
+                localStorage.setItem('theme', 'dark');
+            }
+        });
+
+        // Интеграция базы и Telegram WebApp
         const tg = window.Telegram.WebApp;
         tg.expand();
 
-        // Блокировка контекстного меню (правой кнопки мыши)
         document.addEventListener('contextmenu', e => e.preventDefault());
 
-        // Конфигурация Supabase
         const SUPABASE_URL = 'https://yvnnngfzzjdbeiscwluy.supabase.co';
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl2bm5uZ2Z6empkYmVpc2N3bHV5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ0NzY2ODYsImV4cCI6MjA5MDA1MjY4Nn0.SesGG2QhbJKfAklZDiL8oolWQ6qaTtBwRL_tvigpd9A';
-        
         const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        
         const user = tg.initDataUnsafe?.user;
         const btn = document.getElementById('main-btn');
-        const statusTxt = document.getElementById('status-txt');
+        const btnText = document.getElementById('btn-text');
         const userIdDisplay = document.getElementById('user-id');
+        const descTxt = document.getElementById('desc-txt');
 
         async function init() {
             if (!user || !user.id) {
                 userIdDisplay.textContent = "НЕ ОПРЕДЕЛЕН";
-                btn.textContent = "ОТКРОЙТЕ В ТЕЛЕГРАМ";
+                btnText.textContent = "ОТКРОЙТЕ В ТЕЛЕГРАМ";
                 btn.disabled = true;
                 return;
             }
 
             userIdDisplay.textContent = user.id;
-            btn.textContent = "УЧАСТВОВАТЬ";
+            btnText.textContent = "Участвовать";
             btn.disabled = false;
 
             try {
-                // Проверка участия в таблице raffle
                 const { data } = await sb
                     .from('raffle')
                     .select('telegram_id')
@@ -173,19 +370,19 @@
         }
 
         function setAlreadyParticipant() {
-            btn.textContent = "Уже участник";
+            btnText.textContent = "Уже участник";
             btn.classList.add('btn-success');
             btn.disabled = true;
-            statusTxt.textContent = "ПОДТВЕРЖДЕН";
+            
+            descTxt.textContent = "Вы участвуете!";
+            descTxt.classList.add('success');
         }
 
         btn.onclick = async () => {
             if (!user) return;
-
             btn.disabled = true;
-            btn.textContent = "Записываю..";
+            btnText.textContent = "Записываю..";
             
-            // Запись данных в таблицу raffle
             const { error } = await sb.from('raffle').upsert({ 
                 telegram_id: user.id.toString(), 
                 first_name: user.first_name || '', 
@@ -195,7 +392,7 @@
             if (error) {
                 tg.showAlert("Ошибка: " + error.message);
                 btn.disabled = false;
-                btn.textContent = "УЧАСТВОВАТЬ";
+                btnText.textContent = "Участвовать";
             } else {
                 tg.showAlert("Вы приняли участие в розыгрыше ON1X VPN");
                 setAlreadyParticipant();
