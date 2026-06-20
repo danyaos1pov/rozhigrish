@@ -317,7 +317,7 @@
         </header>
 
         <main class="section-box">
-            <div class="desc-text" id="desc-txt">Для участия нажмите кнопку ниже</div>
+            <div class="desc-text" id="desc-txt">Примите участие</div>
             
             <button class="btn btn-primary" id="main-btn" disabled>
                 <div class="btn-left">
@@ -335,7 +335,7 @@
     <div class="modal-overlay" id="modal-success">
         <div class="modal-window" style="border-color: var(--success-color); box-shadow: 8px 8px 0px var(--success-color);">
             <div class="modal-title" style="color: var(--success-color);">Успешно!</div>
-            <div class="modal-value">Вы приняли участие в розыгрыше ON1X VPN</div>
+            <div class="modal-value">Вы приняли участие!</div>
             <button class="btn" style="padding: 10px; font-size: 14px; justify-content: center; background: var(--success-color); color: #000; box-shadow: 3px 3px 0px #000; border-color: #000;" onclick="closeModal('modal-success')">ОТЛИЧНО</button>
         </div>
     </div>
@@ -407,7 +407,7 @@
         }
 
         function setAlreadyParticipant() {
-            btnText.textContent = "Уже участник";
+            btnText.textContent = "Вы уже участник";
             btn.classList.add('btn-success');
             btn.disabled = true;
             
