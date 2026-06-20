@@ -142,15 +142,15 @@
             box-shadow: 2px 2px 0px var(--shadow-color);
         }
 
-        /* Блок контента */
+        /* Главная секция карточки */
         .section-box {
             background: var(--card-bg);
             border: 3px solid var(--card-border);
             border-radius: 0px;
-            padding: 24px 16px;
+            padding: 28px 16px;
             display: flex;
             flex-direction: column;
-            gap: 20px;
+            gap: 24px;
             box-shadow: 8px 8px 0px var(--shadow-color);
             position: relative;
         }
@@ -184,7 +184,7 @@
             text-align: center;
         }
 
-        /* Кнопки */
+        /* Брутальная кнопка Участвовать */
         .btn {
             display: flex;
             align-items: center;
@@ -225,11 +225,6 @@
             color: var(--btn-primary-text);
         }
 
-        .btn-secondary {
-            background: var(--btn-secondary-bg);
-            color: var(--text-body);
-        }
-
         .btn:disabled {
             background: var(--btn-secondary-bg) !important;
             color: var(--text-sub) !important;
@@ -250,7 +245,7 @@
             opacity: 0.9;
         }
 
-        /* КАСТОМНЫЕ ВСКУСНЫЕ ОКНА (БРУТАЛИЗМ) */
+        /* Кастомные брутальные всплывающие окна */
         .modal-overlay {
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
@@ -294,18 +289,14 @@
             font-size: 14px;
             font-weight: 900;
             text-transform: uppercase;
-            color: var(--text-sub);
             letter-spacing: 1px;
         }
 
         .modal-value {
-            font-size: 24px;
+            font-size: 18px;
             font-weight: 900;
             color: var(--text-title);
-            letter-spacing: 1px;
-            word-break: break-all;
-            -webkit-user-select: text;
-            user-select: text;
+            letter-spacing: 0.5px;
         }
     </style>
 </head>
@@ -328,18 +319,6 @@
         <main class="section-box">
             <div class="desc-text" id="desc-txt">Для участия нажмите кнопку ниже</div>
             
-            <button class="btn btn-secondary" id="id-btn">
-                <div class="btn-left">
-                    <svg width="20" height="20" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
-                    <span>МОЙ ЦИФРОВОЙ ID</span>
-                </div>
-                <svg width="16" height="16" viewBox="0 0 24 24" class="arrow-icon"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
-            </button>
-            
-            <div class="date-badge">Завершение: 25.06.2026</div>
-        </main>
-
-        <section>
             <button class="btn btn-primary" id="main-btn" disabled>
                 <div class="btn-left">
                     <svg width="20" height="20" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
@@ -347,28 +326,22 @@
                 </div>
                 <svg width="16" height="16" viewBox="0 0 24 24" class="arrow-icon"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
             </button>
-        </section>
+            
+            <div class="date-badge">Завершение: 25.06.2026</div>
+        </main>
 
-    </div>
-
-    <div class="modal-overlay" id="modal-id">
-        <div class="modal-window">
-            <div class="modal-title">Ваш ID</div>
-            <div class="modal-value" id="user-id-val">Думаю..</div>
-            <button class="btn btn-primary" style="padding: 10px; font-size: 14px; justify-content: center; box-shadow: 3px 3px 0px #000;" onclick="closeModal('modal-id')">ЗАКРЫТЬ</button>
-        </div>
     </div>
 
     <div class="modal-overlay" id="modal-success">
         <div class="modal-window" style="border-color: var(--success-color); box-shadow: 8px 8px 0px var(--success-color);">
             <div class="modal-title" style="color: var(--success-color);">Успешно!</div>
-            <div class="modal-value" style="font-size: 18px;">Вы приняли участие в розыгрыше ON1X VPN</div>
+            <div class="modal-value">Вы приняли участие в розыгрыше ON1X VPN</div>
             <button class="btn" style="padding: 10px; font-size: 14px; justify-content: center; background: var(--success-color); color: #000; box-shadow: 3px 3px 0px #000; border-color: #000;" onclick="closeModal('modal-success')">ОТЛИЧНО</button>
         </div>
     </div>
 
     <script>
-        // Ротация оригинальных тем
+        // Логика смены тем
         const themeInput = document.getElementById('themeInput');
         const savedTheme = localStorage.getItem('theme') || 'dark';
         if (savedTheme === 'light') {
@@ -389,7 +362,7 @@
             }
         });
 
-        // Управление модальными окнами
+        // Модальные окна
         function openModal(id) { document.getElementById(id).classList.add('active'); }
         function closeModal(id) { document.getElementById(id).classList.remove('active'); }
 
@@ -406,22 +379,15 @@
         const user = tg.initDataUnsafe?.user;
         const btn = document.getElementById('main-btn');
         const btnText = document.getElementById('btn-text');
-        const idBtn = document.getElementById('id-btn');
-        const userIdVal = document.getElementById('user-id-val');
         const descTxt = document.getElementById('desc-txt');
-
-        // Открытие ID модалки по клику на кнопку
-        idBtn.onclick = () => openModal('modal-id');
 
         async function init() {
             if (!user || !user.id) {
-                userIdVal.textContent = "НЕ ОПРЕДЕЛЕН";
                 btnText.textContent = "ОТКРОЙТЕ В ТЕЛЕГРАМ";
                 btn.disabled = true;
                 return;
             }
 
-            userIdVal.textContent = user.id;
             btnText.textContent = "Участвовать";
             btn.disabled = false;
 
@@ -465,7 +431,7 @@
                 btn.disabled = false;
                 btnText.textContent = "Участвовать";
             } else {
-                openModal('modal-success'); // Вызов кастомного окна вместо стандартного алерта
+                openModal('modal-success');
                 setAlreadyParticipant();
             }
         };
