@@ -24,6 +24,7 @@
             
             --slider-bg: #1e293b;
             --slider-thumb: #ccff00;
+            --icon-color: #ffffff;
             
             --success-color: #22c55e;
         }
@@ -44,6 +45,7 @@
             --btn-secondary-border: #000000;
             --slider-bg: #ffffff;
             --slider-thumb: #000000;
+            --icon-color: #000000;
         }
 
         * {
@@ -68,7 +70,7 @@
             transition: background 0.3s ease;
         }
 
-        /* Переключатель темы */
+        /* Переключатель темы с иконками */
         .theme-container {
             display: flex;
             justify-content: center;
@@ -79,30 +81,51 @@
 
         .theme-switch {
             position: relative;
-            width: 64px;
-            height: 34px;
+            width: 76px;
+            height: 38px;
             background: var(--slider-bg);
             border: 2px solid var(--card-border);
             border-radius: 0px;
             box-shadow: 3px 3px 0px var(--shadow-color);
             cursor: pointer;
-            padding: 3px;
+            padding: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
         }
 
         .theme-checkbox {
             display: none;
         }
 
+        /* Иконки внутри ползунка */
+        .switch-icon {
+            width: 18px;
+            height: 18px;
+            fill: none;
+            stroke: var(--icon-color);
+            stroke-width: 2.5;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            z-index: 1;
+            transition: stroke 0.3s ease;
+            margin: 0 4px;
+        }
+
+        /* Ручка переключателя */
         .theme-handle {
-            width: 24px;
-            height: 24px;
+            position: absolute;
+            left: 4px;
+            width: 26px;
+            height: 26px;
             background-color: var(--slider-thumb);
             border: 2px solid var(--card-border);
             transition: transform 0.2s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+            z-index: 2;
         }
 
         .theme-checkbox:checked + .theme-switch .theme-handle {
-            transform: translateX(30px);
+            transform: translateX(38px);
         }
 
         /* Контейнер */
@@ -305,7 +328,9 @@
     <div class="theme-container">
         <input type="checkbox" id="themeInput" class="theme-checkbox">
         <label for="themeInput" class="theme-switch">
+            <svg class="switch-icon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
             <div class="theme-handle"></div>
+            <svg class="switch-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
         </label>
     </div>
 
@@ -335,7 +360,7 @@
     <div class="modal-overlay" id="modal-success">
         <div class="modal-window" style="border-color: var(--success-color); box-shadow: 8px 8px 0px var(--success-color);">
             <div class="modal-title" style="color: var(--success-color);">Успешно!</div>
-            <div class="modal-value">Вы приняли участие!</div>
+            <div class="modal-value">Вы приняли участие в розыгрыше!</div>
             <button class="btn" style="padding: 10px; font-size: 14px; justify-content: center; background: var(--success-color); color: #000; box-shadow: 3px 3px 0px #000; border-color: #000;" onclick="closeModal('modal-success')">ОТЛИЧНО</button>
         </div>
     </div>
