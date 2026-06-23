@@ -57,7 +57,8 @@
             justify-content: center;
             align-items: center;
             width: 100%;
-            margin-bottom: 40px;
+            max-width: 360px;
+            margin-bottom: 28px;
         }
 
         .theme-switch {
@@ -721,28 +722,40 @@
         return data || null;
     }
 
+    // ─── Глобальное состояние ────────────────────────────────────
+    let currentRecord = null;
+    let isChecking = false; // блокировка двойного нажатия
+
     // ─── Чек-ин ─────────────────────────────────────────────────
-    async function doCheckin(record) {
+    async function doCheckin() {
+        // Двойная защита: если уже идёт запрос или день отмечен — выходим
+        if (isChecking) return;
+        const today = getTodayDayNum();
+        if (today > 30) return;
+        if (currentRecord && currentRecord[`day_${today}`] === 1) return;
+
+        isChecking = true;
         const btn = document.getElementById('checkinBtn');
         btn.disabled = true;
         btn.textContent = '...';
 
-        const today = getTodayDayNum();
         const dayCol = `day_${today}`;
 
-        if (record) {
+        if (currentRecord) {
             // Обновляем существующую запись
             const { error } = await db
                 .from('payments')
                 .update({
                     [dayCol]: 1,
-                    balance: (record.balance || 0) + 1
+                    balance: (currentRecord.balance || 0) + 1
                 })
-                .eq('telegram_id', TELEGRAM_ID);
+                .eq('telegram_id', TELEGRAM_ID)
+                .eq(dayCol, 0); // доп. защита на уровне запроса: обновляем только если день ещё 0
 
             if (error) {
                 showToast('Ошибка сервера', 'error');
-                updateButtonState(record);
+                updateButtonState(currentRecord);
+                isChecking = false;
                 return;
             }
         } else {
@@ -753,37 +766,35 @@
             if (error) {
                 showToast('Ошибка сервера', 'error');
                 updateButtonState(null);
+                isChecking = false;
                 return;
             }
         }
 
-        // Перечитываем данные
-        const updated = await loadData();
-        document.getElementById('balanceValue').textContent = updated?.balance ?? 1;
-        renderDays(updated);
-        updateButtonState(updated);
+        // Перечитываем данные и обновляем глобальный record
+        currentRecord = await loadData();
+        document.getElementById('balanceValue').textContent = currentRecord?.balance ?? 1;
+        renderDays(currentRecord);
+        updateButtonState(currentRecord);
         showToast('+1 балл начислен!', 'success');
         tg?.HapticFeedback?.notificationOccurred('success');
+        isChecking = false;
     }
 
     // ─── Инициализация ──────────────────────────────────────────
     async function init() {
-        // UI пользователя
         const initial = DISPLAY_NAME[0]?.toUpperCase() || '?';
         document.getElementById('userAvatar').textContent = initial;
         document.getElementById('userName').textContent = DISPLAY_NAME;
         document.getElementById('userId').textContent = 'ID: ' + TELEGRAM_ID;
 
-        const record = await loadData();
+        currentRecord = await loadData();
 
-        document.getElementById('balanceValue').textContent = record?.balance ?? 0;
-        renderDays(record);
-        updateButtonState(record);
+        document.getElementById('balanceValue').textContent = currentRecord?.balance ?? 0;
+        renderDays(currentRecord);
+        updateButtonState(currentRecord);
 
-        document.getElementById('checkinBtn').addEventListener('pointerdown', () => {
-            doCheckin(record).then(() => {});
-            // После чек-ина record обновится внутри doCheckin через перечитывание
-        });
+        document.getElementById('checkinBtn').addEventListener('pointerdown', doCheckin);
 
         // Показываем приложение
         document.getElementById('loader').classList.add('hidden');
