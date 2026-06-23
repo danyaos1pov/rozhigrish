@@ -3,11 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ON1X VPN — Ежедневный бонус</title>
+    <title>ON1X VPN — Розыгрыш</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         :root {
+            /* Твоя оригинальная темная тема */
             --bg-main: #0b0f17;
             --card-bg: #1e293b;
             --card-border: #000000;
@@ -15,21 +16,21 @@
             --text-title: #ffffff;
             --text-body: #f8fafc;
             --text-sub: #94a3b8;
-            --btn-primary-bg: #ccff00;
+            
+            --btn-primary-bg: #ccff00; /* Токсичный лайм */
             --btn-primary-text: #000000;
             --btn-secondary-bg: #0f172a;
             --btn-secondary-border: #000000;
+            
             --slider-bg: #1e293b;
             --slider-thumb: #ccff00;
             --icon-color: #ffffff;
-            --success-green: #2ecc71;
-            --admin-red: #ff4d4d;
-            --day-done: #ccff00;
-            --day-missed: #1e293b;
-            --day-future: #0f172a;
+            
+            --success-color: #22c55e;
         }
 
         [data-theme="light"] {
+            /* Твоя оригинальная светлая тема */
             --bg-main: #f1f5f9;
             --card-bg: #ffffff;
             --card-border: #000000;
@@ -37,6 +38,7 @@
             --text-title: #000000;
             --text-body: #0f172a;
             --text-sub: #64748b;
+            
             --btn-primary-bg: #000000;
             --btn-primary-text: #ffffff;
             --btn-secondary-bg: #f8fafc;
@@ -44,21 +46,37 @@
             --slider-bg: #ffffff;
             --slider-thumb: #000000;
             --icon-color: #000000;
-            --success-green: #27ae60;
-            --admin-red: #d32f2f;
-            --day-done: #000000;
-            --day-missed: #e2e8f0;
-            --day-future: #f8fafc;
         }
 
-        /* Переключатель темы */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;   
+            user-select: none;
+        }
+
+        body {
+            background-color: var(--bg-main);
+            color: var(--text-body);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding: 40px 24px;
+            transition: background 0.3s ease;
+        }
+
+        /* Переключатель темы с иконками */
         .theme-container {
             display: flex;
             justify-content: center;
             align-items: center;
             width: 100%;
-            max-width: 360px;
-            margin-bottom: 28px;
+            margin-bottom: 40px;
         }
 
         .theme-switch {
@@ -74,13 +92,13 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            transition: background 0.3s ease;
         }
 
         .theme-checkbox {
             display: none;
         }
 
+        /* Иконки внутри ползунка */
         .switch-icon {
             width: 18px;
             height: 18px;
@@ -94,6 +112,7 @@
             margin: 0 4px;
         }
 
+        /* Ручка переключателя */
         .theme-handle {
             position: absolute;
             left: 4px;
@@ -109,32 +128,13 @@
             transform: translateX(38px);
         }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            -webkit-tap-highlight-color: transparent;
-        }
-
-        body {
-            -webkit-user-select: none;
-            user-select: none;
-            background-color: var(--bg-main);
-            color: var(--text-body);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            min-height: 100vh;
-            padding: 32px 20px 40px;
-            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-        }
-
+        /* Контейнер */
         .container {
             width: 100%;
             max-width: 360px;
             display: flex;
             flex-direction: column;
-            gap: 24px;
+            gap: 28px;
         }
 
         /* Шапка */
@@ -143,7 +143,7 @@
         }
 
         .brand-title {
-            font-size: 38px;
+            font-size: 42px;
             font-weight: 900;
             letter-spacing: -1px;
             color: var(--text-title);
@@ -153,7 +153,7 @@
 
         .brand-slogan {
             display: inline-block;
-            font-size: 11px;
+            font-size: 12px;
             background: var(--btn-primary-bg);
             color: var(--btn-primary-text);
             border: 2px solid var(--card-border);
@@ -165,659 +165,303 @@
             box-shadow: 2px 2px 0px var(--shadow-color);
         }
 
-        /* Карточка баланса */
-        .balance-card {
+        /* Главная секция карточки */
+        .section-box {
             background: var(--card-bg);
             border: 3px solid var(--card-border);
-            padding: 28px 20px;
-            text-align: center;
-            box-shadow: 8px 8px 0px var(--shadow-color);
+            border-radius: 0px;
+            padding: 28px 16px;
             display: flex;
             flex-direction: column;
-            align-items: center;
-            gap: 6px;
+            gap: 24px;
+            box-shadow: 8px 8px 0px var(--shadow-color);
+            position: relative;
         }
 
-        .balance-label {
-            font-size: 11px;
-            font-weight: 900;
+        /* Текст по середине */
+        .desc-text {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--text-body);
             text-transform: uppercase;
-            letter-spacing: 2px;
-            color: var(--text-sub);
+            letter-spacing: 0.5px;
+            text-align: center;
+            transition: color 0.3s ease;
         }
 
-        .balance-value {
-            font-size: 72px;
-            font-weight: 900;
-            color: var(--btn-primary-bg);
-            line-height: 1;
-            -webkit-text-stroke: 2px var(--card-border);
-            letter-spacing: -2px;
+        .desc-text.success {
+            color: var(--success-color) !important;
         }
 
-        .balance-unit {
-            font-size: 13px;
+        /* Дату завершения по середине */
+        .date-badge {
+            font-size: 12px;
             font-weight: 800;
-            color: var(--text-sub);
+            color: var(--card-border);
+            background: #fff;
+            border: 2px solid var(--card-border);
+            padding: 6px 12px;
+            align-self: center;
+            box-shadow: 3px 3px 0px var(--shadow-color);
             text-transform: uppercase;
-            letter-spacing: 1px;
+            text-align: center;
         }
 
-        /* Блок пользователя */
-        .user-card {
-            background: var(--btn-secondary-bg);
-            border: 3px solid var(--card-border);
-            padding: 14px 16px;
+        /* Брутальная кнопка Участвовать */
+        .btn {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            padding: 16px 20px;
+            font-size: 16px;
+            font-weight: 800;
+            text-decoration: none;
+            border: 2px solid var(--card-border);
+            position: relative;
             box-shadow: 4px 4px 0px var(--shadow-color);
+            transition: transform 0.1s ease, box-shadow 0.1s ease;
+            cursor: pointer;
+        }
+
+        .btn-left {
             display: flex;
             align-items: center;
             gap: 12px;
         }
 
-        .user-avatar {
-            width: 38px;
-            height: 38px;
-            background: var(--btn-primary-bg);
-            border: 2px solid var(--card-border);
-            color: var(--btn-primary-text);
-            display: grid;
-            place-items: center;
-            font-weight: 900;
-            font-size: 16px;
-            flex-shrink: 0;
+        .btn svg {
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 2.5;
+            stroke-linecap: round;
+            stroke-linejoin: round;
         }
 
-        .user-info {
-            display: flex;
-            flex-direction: column;
-            gap: 2px;
+        .btn:not(:disabled):active {
+            transform: translate(2px, 2px);
+            box-shadow: 2px 2px 0px var(--shadow-color);
         }
 
-        .user-name {
-            font-size: 14px;
-            font-weight: 800;
-            color: var(--text-title);
-        }
-
-        .user-id {
-            font-size: 11px;
-            color: var(--text-sub);
-            font-weight: 500;
-        }
-
-        /* Кнопка чек-ин */
-        .btn {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 100%;
-            padding: 18px 20px;
-            font-size: 17px;
-            font-weight: 800;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            border: 3px solid var(--card-border);
-            box-shadow: 6px 6px 0px var(--shadow-color);
-            cursor: pointer;
-            transition: transform 0.1s ease, box-shadow 0.1s ease;
+        .btn-primary {
             background: var(--btn-primary-bg);
             color: var(--btn-primary-text);
-        }
-
-        .btn:active {
-            transform: translate(3px, 3px);
-            box-shadow: 3px 3px 0px var(--shadow-color);
         }
 
         .btn:disabled {
-            background: var(--card-bg);
-            color: var(--text-sub);
+            background: var(--btn-secondary-bg) !important;
+            color: var(--text-sub) !important;
+            box-shadow: none !important;
+            transform: translate(4px, 4px);
             cursor: not-allowed;
-            box-shadow: 4px 4px 0px var(--shadow-color);
         }
 
-        .btn:disabled:active {
-            transform: none;
-            box-shadow: 4px 4px 0px var(--shadow-color);
+        .btn.btn-success {
+            border: 2px solid var(--success-color) !important;
+            color: var(--success-color) !important;
+            background: var(--btn-secondary-bg) !important;
+            box-shadow: none !important;
+            transform: translate(4px, 4px);
         }
 
-        /* Статус кнопки */
-        .btn-status {
-            font-size: 11px;
-            font-weight: 700;
-            text-align: center;
-            color: var(--text-sub);
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-top: -8px;
+        .arrow-icon {
+            opacity: 0.9;
         }
 
-        .btn-status.done {
-            color: var(--success-green);
+        /* Кастомные брутальные всплывающие окна */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(4px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+            z-index: 100;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.2s ease, visibility 0.2s ease;
         }
 
-        /* Сетка дней */
-        .days-card {
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-window {
             background: var(--card-bg);
             border: 3px solid var(--card-border);
-            padding: 20px 16px;
-            box-shadow: 8px 8px 0px var(--shadow-color);
-            display: flex;
-            flex-direction: column;
-            gap: 14px;
-        }
-
-        .days-title {
-            font-size: 11px;
-            font-weight: 900;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            color: var(--text-sub);
-            border-bottom: 2px dashed var(--card-border);
-            padding-bottom: 10px;
-        }
-
-        .days-grid {
-            display: grid;
-            grid-template-columns: repeat(6, 1fr);
-            gap: 8px;
-        }
-
-        .day-cell {
-            aspect-ratio: 1;
-            border: 2px solid var(--card-border);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            font-size: 10px;
-            font-weight: 900;
-            gap: 2px;
-            position: relative;
-        }
-
-        .day-cell.done {
-            background: var(--day-done);
-            color: #000;
-            box-shadow: 2px 2px 0px var(--shadow-color);
-        }
-
-        .day-cell.missed {
-            background: var(--day-missed);
-            color: var(--text-sub);
-        }
-
-        .day-cell.future {
-            background: var(--day-future);
-            color: #2a3a4a;
-        }
-
-        .day-cell.today {
-            border: 2px solid var(--btn-primary-bg);
-            box-shadow: 0 0 0 1px var(--btn-primary-bg);
-        }
-
-        .day-num {
-            font-size: 13px;
-            font-weight: 900;
-            line-height: 1;
-        }
-
-        .day-check {
-            font-size: 9px;
-            line-height: 1;
-        }
-
-        /* Инфо-блок */
-        .info-card {
-            background: var(--btn-secondary-bg);
-            border: 3px solid var(--card-border);
-            padding: 16px;
-            box-shadow: 4px 4px 0px var(--shadow-color);
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .info-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 13px;
-        }
-
-        .info-row span:first-child {
-            color: var(--text-sub);
-            font-weight: 600;
-            text-transform: uppercase;
-            font-size: 11px;
-            letter-spacing: 1px;
-        }
-
-        .info-row span:last-child {
-            color: var(--text-title);
-            font-weight: 900;
-            font-size: 14px;
-        }
-
-        .info-divider {
-            border: none;
-            border-top: 1px dashed #2a3a4a;
-        }
-
-        /* Тост */
-        .toast {
-            position: fixed;
-            top: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            padding: 14px 24px;
-            font-weight: 800;
-            font-size: 13px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            border: 3px solid #000;
-            z-index: 9999;
-            display: none;
-            box-shadow: 4px 4px 0px var(--shadow-color);
-            text-align: center;
-            white-space: nowrap;
-            max-width: calc(100vw - 40px);
-        }
-
-        .toast.show { display: block; }
-        .toast.error { background: var(--admin-red); color: #fff; }
-        .toast.success { background: var(--success-green); color: #fff; }
-
-        /* Загрузка */
-        .loader {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 16px;
-            min-height: 60vh;
+            padding: 24px 20px;
             width: 100%;
+            max-width: 320px;
+            box-shadow: 8px 8px 0px var(--shadow-color);
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            transform: scale(0.9);
+            transition: transform 0.2s ease;
         }
 
-        .loader-box {
-            width: 48px;
-            height: 48px;
-            border: 4px solid var(--card-border);
-            background: var(--btn-primary-bg);
-            box-shadow: 4px 4px 0px var(--shadow-color);
-            animation: bruteSpin 0.8s steps(4) infinite;
+        .modal-overlay.active .modal-window {
+            transform: scale(1);
         }
 
-        @keyframes bruteSpin {
-            to { transform: rotate(360deg); }
-        }
-
-        .loader-text {
-            font-size: 12px;
+        .modal-title {
+            font-size: 14px;
             font-weight: 900;
             text-transform: uppercase;
-            letter-spacing: 2px;
-            color: var(--text-sub);
+            letter-spacing: 1px;
         }
 
-        .hidden { display: none !important; }
-
-        /* Полоска прогресса */
-        .progress-wrap {
-            background: var(--btn-secondary-bg);
-            border: 2px solid var(--card-border);
-            height: 14px;
-            position: relative;
-            box-shadow: 2px 2px 0px var(--shadow-color);
-        }
-
-        .progress-bar {
-            height: 100%;
-            background: var(--btn-primary-bg);
-            transition: width 0.4s ease;
-        }
-
-        .progress-label {
-            position: absolute;
-            right: 6px;
-            top: 50%;
-            transform: translateY(-50%);
-            font-size: 9px;
+        .modal-value {
+            font-size: 18px;
             font-weight: 900;
-            color: #000;
-            mix-blend-mode: difference;
             color: var(--text-title);
+            letter-spacing: 0.5px;
         }
     </style>
 </head>
 <body>
 
-<div class="theme-container">
-    <input type="checkbox" id="themeInput" class="theme-checkbox">
-    <label for="themeInput" class="theme-switch">
-        <svg class="switch-icon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
-        <div class="theme-handle"></div>
-        <svg class="switch-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
-    </label>
-</div>
+    <div class="theme-container">
+        <input type="checkbox" id="themeInput" class="theme-checkbox">
+        <label for="themeInput" class="theme-switch">
+            <svg class="switch-icon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+            <div class="theme-handle"></div>
+            <svg class="switch-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+        </label>
+    </div>
 
-<div id="toast" class="toast"></div>
+    <div class="container">
+        
+        <header class="brand-header">
+            <h1 class="brand-title">ON1X VPN</h1>
+            <p class="brand-slogan">Розыгрыш подписок</p>
+        </header>
 
-<!-- Загрузка -->
-<div class="loader" id="loader">
-    <div class="loader-box"></div>
-    <p class="loader-text">Загрузка...</p>
-</div>
+        <main class="section-box">
+            <div class="desc-text" id="desc-txt">Примите участие</div>
+            
+            <button class="btn btn-primary" id="main-btn" disabled>
+                <div class="btn-left">
+                    <svg width="20" height="20" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+                    <span id="btn-text">ЗАГРУЗКА...</span>
+                </div>
+                <svg width="16" height="16" viewBox="0 0 24 24" class="arrow-icon"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+            </button>
+            
+            <div class="date-badge">Завершение: 25.06.2026</div>
+        </main>
 
-<!-- Основной контент -->
-<div class="container hidden" id="app">
+    </div>
 
-    <header class="brand-header">
-        <h1 class="brand-title">ON1X VPN</h1>
-        <div><span class="brand-slogan">Ежедневный бонус</span></div>
-    </header>
-
-    <!-- Пользователь -->
-    <div class="user-card">
-        <div class="user-avatar" id="userAvatar">?</div>
-        <div class="user-info">
-            <span class="user-name" id="userName">—</span>
-            <span class="user-id" id="userId">ID: —</span>
+    <div class="modal-overlay" id="modal-success">
+        <div class="modal-window" style="border-color: var(--success-color); box-shadow: 8px 8px 0px var(--success-color);">
+            <div class="modal-title" style="color: var(--success-color);">Успешно!</div>
+            <div class="modal-value">Вы приняли участие в розыгрыше!</div>
+            <button class="btn" style="padding: 10px; font-size: 14px; justify-content: center; background: var(--success-color); color: #000; box-shadow: 3px 3px 0px #000; border-color: #000;" onclick="closeModal('modal-success')">ОТЛИЧНО</button>
         </div>
     </div>
 
-    <!-- Баланс -->
-    <div class="balance-card">
-        <span class="balance-label">Ваш баланс</span>
-        <span class="balance-value" id="balanceValue">0</span>
-        <span class="balance-unit">баллов</span>
-    </div>
-
-    <!-- Кнопка чек-ин -->
-    <button class="btn" id="checkinBtn">✦ Отметиться сегодня</button>
-    <p class="btn-status" id="btnStatus">+1 балл за отметку</p>
-
-    <!-- Сетка 30 дней -->
-    <div class="days-card">
-        <p class="days-title">Прогресс — 30 дней</p>
-        <div class="progress-wrap">
-            <div class="progress-bar" id="progressBar" style="width: 0%"></div>
-            <span class="progress-label" id="progressLabel">0 / 30</span>
-        </div>
-        <div class="days-grid" id="daysGrid"></div>
-    </div>
-
-    <!-- Инфо -->
-    <div class="info-card">
-        <div class="info-row">
-            <span>Отмечено дней</span>
-            <span id="doneCount">0</span>
-        </div>
-        <hr class="info-divider">
-        <div class="info-row">
-            <span>Пропущено дней</span>
-            <span id="missedCount">0</span>
-        </div>
-        <hr class="info-divider">
-        <div class="info-row">
-            <span>Сегодняшний день</span>
-            <span id="todayNum">—</span>
-        </div>
-    </div>
-
-</div>
-
-<script>
-    // ─── Тема ───────────────────────────────────────────────────
-    const themeInput = document.getElementById('themeInput');
-    const savedTheme = localStorage.getItem('theme') || 'dark';
-    if (savedTheme === 'light') {
-        document.documentElement.setAttribute('data-theme', 'light');
-        themeInput.checked = true;
-    } else {
-        document.documentElement.setAttribute('data-theme', 'dark');
-        themeInput.checked = false;
-    }
-    themeInput.addEventListener('change', () => {
-        if (themeInput.checked) {
+    <script>
+        // Логика смены тем
+        const themeInput = document.getElementById('themeInput');
+        const savedTheme = localStorage.getItem('theme') || 'dark';
+        if (savedTheme === 'light') {
             document.documentElement.setAttribute('data-theme', 'light');
-            localStorage.setItem('theme', 'light');
+            themeInput.checked = true;
         } else {
             document.documentElement.setAttribute('data-theme', 'dark');
-            localStorage.setItem('theme', 'dark');
+            themeInput.checked = false;
         }
-    });
 
-    // ─── Supabase ───────────────────────────────────────────────
-    const SB_URL = 'https://yvnnngfzzjdbeiscwluy.supabase.co';
-    const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl2bm5uZ2Z6empkYmVpc2N3bHV5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ0NzY2ODYsImV4cCI6MjA5MDA1MjY4Nn0.SesGG2QhbJKfAklZDiL8oolWQ6qaTtBwRL_tvigpd9A';
-    const db = supabase.createClient(SB_URL, SB_KEY);
-
-    // ─── Telegram WebApp ────────────────────────────────────────
-    const tg = window.Telegram?.WebApp;
-    tg?.ready();
-    tg?.expand();
-
-    const tgUser = tg?.initDataUnsafe?.user;
-
-    // Если открыто не через Telegram — показываем заглушку и останавливаемся
-    if (!tgUser) {
-        document.getElementById('loader').innerHTML = `
-            <div style="
-                background: var(--card-bg);
-                border: 3px solid var(--card-border);
-                box-shadow: 8px 8px 0px var(--shadow-color);
-                padding: 32px 24px;
-                text-align: center;
-                max-width: 300px;
-                display: flex;
-                flex-direction: column;
-                gap: 16px;
-            ">
-                <div style="font-size: 40px;">🔒</div>
-                <p style="font-size: 15px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; color: var(--text-title);">Только для Telegram</p>
-                <p style="font-size: 13px; color: var(--text-sub); line-height: 1.5;">Это приложение работает только внутри Telegram. Открой его через бота ON1X VPN.</p>
-            </div>
-        `;
-        // Останавливаем выполнение скрипта
-        throw new Error('Not a Telegram WebApp');
-    }
-
-    const TELEGRAM_ID = String(tgUser.id);
-    const DISPLAY_NAME = tgUser.first_name + (tgUser.last_name ? ' ' + tgUser.last_name : '');
-
-    // ─── Утилиты ────────────────────────────────────────────────
-
-    // День месяца (1–30+), используем как индекс.
-    // Логика: считаем с 1-го числа текущего месяца.
-    // Можно заменить на «день с момента регистрации» при необходимости.
-    function getTodayDayNum() {
-        return new Date().getDate(); // 1–31
-    }
-
-    function showToast(text, type) {
-        const t = document.getElementById('toast');
-        t.textContent = text;
-        t.className = `toast show ${type}`;
-        setTimeout(() => t.classList.remove('show'), 3000);
-    }
-
-    function renderDays(record) {
-        const grid = document.getElementById('daysGrid');
-        const today = getTodayDayNum();
-        grid.innerHTML = '';
-        let done = 0;
-
-        for (let d = 1; d <= 30; d++) {
-            const val = record ? (record[`day_${d}`] ?? 0) : 0;
-            const cell = document.createElement('div');
-            cell.className = 'day-cell';
-
-            const numEl = document.createElement('span');
-            numEl.className = 'day-num';
-            numEl.textContent = d;
-
-            const iconEl = document.createElement('span');
-            iconEl.className = 'day-check';
-
-            if (val === 1) {
-                cell.classList.add('done');
-                iconEl.textContent = '✓';
-                done++;
-            } else if (d < today) {
-                cell.classList.add('missed');
-                iconEl.textContent = '✕';
-            } else if (d === today) {
-                cell.classList.add('future');
-                iconEl.textContent = '●';
+        themeInput.addEventListener('change', () => {
+            if (themeInput.checked) {
+                document.documentElement.setAttribute('data-theme', 'light');
+                localStorage.setItem('theme', 'light');
             } else {
-                cell.classList.add('future');
-                iconEl.textContent = '';
+                document.documentElement.setAttribute('data-theme', 'dark');
+                localStorage.setItem('theme', 'dark');
+            }
+        });
+
+        // Модальные окна
+        function openModal(id) { document.getElementById(id).classList.add('active'); }
+        function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+
+        // Работа с Telegram и Supabase
+        const tg = window.Telegram.WebApp;
+        tg.expand();
+
+        document.addEventListener('contextmenu', e => e.preventDefault());
+
+        const SUPABASE_URL = 'https://yvnnngfzzjdbeiscwluy.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl2bm5uZ2Z6empkYmVpc2N3bHV5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ0NzY2ODYsImV4cCI6MjA5MDA1MjY4Nn0.SesGG2QhbJKfAklZDiL8oolWQ6qaTtBwRL_tvigpd9A';
+        const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        
+        const user = tg.initDataUnsafe?.user;
+        const btn = document.getElementById('main-btn');
+        const btnText = document.getElementById('btn-text');
+        const descTxt = document.getElementById('desc-txt');
+
+        async function init() {
+            if (!user || !user.id) {
+                btnText.textContent = "ОТКРОЙТЕ В ТЕЛЕГРАМ";
+                btn.disabled = true;
+                return;
             }
 
-            if (d === today) cell.classList.add('today');
-
-            cell.appendChild(numEl);
-            cell.appendChild(iconEl);
-            grid.appendChild(cell);
-        }
-
-        const missed = Math.max(0, today - 1 - done);
-        document.getElementById('doneCount').textContent = done;
-        document.getElementById('missedCount').textContent = missed;
-        document.getElementById('todayNum').textContent = `День ${today}`;
-
-        const pct = Math.round((done / 30) * 100);
-        document.getElementById('progressBar').style.width = pct + '%';
-        document.getElementById('progressLabel').textContent = `${done} / 30`;
-    }
-
-    function updateButtonState(record) {
-        const btn = document.getElementById('checkinBtn');
-        const status = document.getElementById('btnStatus');
-        const today = getTodayDayNum();
-
-        if (today > 30) {
-            btn.disabled = true;
-            btn.textContent = '✦ Месяц завершён';
-            status.textContent = 'Все 30 дней пройдены';
-            status.className = 'btn-status done';
-            return;
-        }
-
-        if (record && record[`day_${today}`] === 1) {
-            btn.disabled = true;
-            btn.textContent = '✔ Уже отмечено';
-            status.textContent = 'Возвращайся завтра за новым баллом';
-            status.className = 'btn-status done';
-        } else {
+            btnText.textContent = "Участвовать";
             btn.disabled = false;
-            btn.textContent = '✦ Отметиться сегодня';
-            status.textContent = '+1 балл за отметку';
-            status.className = 'btn-status';
-        }
-    }
 
-    // ─── Загрузка данных ────────────────────────────────────────
-    async function loadData() {
-        const { data, error } = await db
-            .from('payments')
-            .select('*')
-            .eq('telegram_id', TELEGRAM_ID)
-            .single();
+            try {
+                const { data } = await sb
+                    .from('raffle')
+                    .select('telegram_id')
+                    .eq('telegram_id', user.id.toString())
+                    .maybeSingle();
 
-        if (error && error.code !== 'PGRST116') {
-            showToast('Ошибка загрузки', 'error');
-            return null;
-        }
-
-        return data || null;
-    }
-
-    // ─── Глобальное состояние ────────────────────────────────────
-    let currentRecord = null;
-    let isChecking = false; // блокировка двойного нажатия
-
-    // ─── Чек-ин ─────────────────────────────────────────────────
-    async function doCheckin() {
-        // Двойная защита: если уже идёт запрос или день отмечен — выходим
-        if (isChecking) return;
-        const today = getTodayDayNum();
-        if (today > 30) return;
-        if (currentRecord && currentRecord[`day_${today}`] === 1) return;
-
-        isChecking = true;
-        const btn = document.getElementById('checkinBtn');
-        btn.disabled = true;
-        btn.textContent = '...';
-
-        const dayCol = `day_${today}`;
-
-        if (currentRecord) {
-            // Обновляем существующую запись
-            const { error } = await db
-                .from('payments')
-                .update({
-                    [dayCol]: 1,
-                    balance: (currentRecord.balance || 0) + 1
-                })
-                .eq('telegram_id', TELEGRAM_ID)
-                .eq(dayCol, 0); // доп. защита на уровне запроса: обновляем только если день ещё 0
-
-            if (error) {
-                showToast('Ошибка сервера', 'error');
-                updateButtonState(currentRecord);
-                isChecking = false;
-                return;
-            }
-        } else {
-            // Создаём новую запись
-            const newRow = { telegram_id: TELEGRAM_ID, balance: 1, [dayCol]: 1 };
-            const { error } = await db.from('payments').insert([newRow]);
-
-            if (error) {
-                showToast('Ошибка сервера', 'error');
-                updateButtonState(null);
-                isChecking = false;
-                return;
+                if (data) {
+                    setAlreadyParticipant();
+                }
+            } catch (e) {
+                console.warn("Ошибка проверки статуса:", e);
             }
         }
 
-        // Перечитываем данные и обновляем глобальный record
-        currentRecord = await loadData();
-        document.getElementById('balanceValue').textContent = currentRecord?.balance ?? 1;
-        renderDays(currentRecord);
-        updateButtonState(currentRecord);
-        showToast('+1 балл начислен!', 'success');
-        tg?.HapticFeedback?.notificationOccurred('success');
-        isChecking = false;
-    }
+        function setAlreadyParticipant() {
+            btnText.textContent = "Вы уже участник";
+            btn.classList.add('btn-success');
+            btn.disabled = true;
+            
+            descTxt.textContent = "Вы участвуете!";
+            descTxt.classList.add('success');
+        }
 
-    // ─── Инициализация ──────────────────────────────────────────
-    async function init() {
-        const initial = DISPLAY_NAME[0]?.toUpperCase() || '?';
-        document.getElementById('userAvatar').textContent = initial;
-        document.getElementById('userName').textContent = DISPLAY_NAME;
-        document.getElementById('userId').textContent = 'ID: ' + TELEGRAM_ID;
+        btn.onclick = async () => {
+            if (!user) return;
+            btn.disabled = true;
+            btnText.textContent = "Записываю..";
+            
+            const { error } = await sb.from('raffle').upsert({ 
+                telegram_id: user.id.toString(), 
+                first_name: user.first_name || '', 
+                username: user.username || '' 
+            }, { onConflict: 'telegram_id' });
 
-        currentRecord = await loadData();
+            if (error) {
+                tg.showAlert("Ошибка: " + error.message);
+                btn.disabled = false;
+                btnText.textContent = "Участвовать";
+            } else {
+                openModal('modal-success');
+                setAlreadyParticipant();
+            }
+        };
 
-        document.getElementById('balanceValue').textContent = currentRecord?.balance ?? 0;
-        renderDays(currentRecord);
-        updateButtonState(currentRecord);
-
-        document.getElementById('checkinBtn').addEventListener('pointerdown', doCheckin);
-
-        // Показываем приложение
-        document.getElementById('loader').classList.add('hidden');
-        document.getElementById('app').classList.remove('hidden');
-    }
-
-    init();
-
-    // Защита от правой кнопки
-    document.addEventListener('contextmenu', e => e.preventDefault());
-</script>
+        init();
+    </script>
 </body>
 </html>
