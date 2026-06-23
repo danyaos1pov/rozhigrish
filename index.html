@@ -601,18 +601,31 @@
 
     const tgUser = tg?.initDataUnsafe?.user;
 
-    // Если открыто не в Telegram — использовать тестовый ID для отладки
-    const TELEGRAM_ID = tgUser
-        ? String(tgUser.id)
-        : 'debug_' + (localStorage.getItem('debug_id') || (() => {
-            const id = Math.floor(Math.random() * 99999);
-            localStorage.setItem('debug_id', id);
-            return id;
-        })());
+    // Если открыто не через Telegram — показываем заглушку и останавливаемся
+    if (!tgUser) {
+        document.getElementById('loader').innerHTML = `
+            <div style="
+                background: var(--card-bg);
+                border: 3px solid var(--card-border);
+                box-shadow: 8px 8px 0px var(--shadow-color);
+                padding: 32px 24px;
+                text-align: center;
+                max-width: 300px;
+                display: flex;
+                flex-direction: column;
+                gap: 16px;
+            ">
+                <div style="font-size: 40px;">🔒</div>
+                <p style="font-size: 15px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; color: var(--text-title);">Только для Telegram</p>
+                <p style="font-size: 13px; color: var(--text-sub); line-height: 1.5;">Это приложение работает только внутри Telegram. Открой его через бота ON1X VPN.</p>
+            </div>
+        `;
+        // Останавливаем выполнение скрипта
+        throw new Error('Not a Telegram WebApp');
+    }
 
-    const DISPLAY_NAME = tgUser
-        ? (tgUser.first_name + (tgUser.last_name ? ' ' + tgUser.last_name : ''))
-        : 'Тест';
+    const TELEGRAM_ID = String(tgUser.id);
+    const DISPLAY_NAME = tgUser.first_name + (tgUser.last_name ? ' ' + tgUser.last_name : '');
 
     // ─── Утилиты ────────────────────────────────────────────────
 
